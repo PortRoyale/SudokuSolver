@@ -9,7 +9,7 @@ import pygame
 from pygame.locals import *
 import os
 import random
-import numpy as np
+import math
 
 
 pygame.init() # initialize pygame
@@ -20,7 +20,7 @@ os.environ['SDL_VIDEO_CENTERED'] = '1'  # center window
 # CONSTANTS
 WIN_WIDTH = 500
 WIN_HEIGHT = 500
-NUM_FONT = pygame.font.SysFont("Cascadia Code", 50)
+NUMBER_FONT = pygame.font.SysFont("Cascadia Code", 50)
 # Colors 
 BLACK = (0,0,0)
 WHITE = (255,255,255)
@@ -31,6 +31,10 @@ BRIGHT_RED = (255,0,0)
 BRIGHT_GREEN = (0,255,0)
 X_OFFSET = 42
 Y_OFFSET = 36
+
+
+# a list of 81 numbers separated by spaces. zeroes are blanks in the sudoku
+SUDOKU_START = "3 0 6 5 0 8 4 0 0 5 2 0 0 0 0 0 0 0 0 8 7 0 0 0 0 3 1 0 0 3 0 1 0 0 8 0 9 0 0 8 6 3 0 0 5 0 5 0 0 9 0 6 0 0 1 3 0 0 0 0 2 5 0 0 0 0 0 0 0 0 7 4 0 0 5 2 0 6 3 0 0"
 
 
 # 9x9 GLOBAL matrix of pixel locations to the center of each square
@@ -58,29 +62,26 @@ class Grid:  # this is the sudoku grid of the window
     def __init__(self):
         self.y = 0
         self.x = 0
-        self.locs = [] # this is a 9x9 matrix of grid square center points
+        self.start = SUDOKU_START.split()
 
     def draw(self, win):
         win.blit(self.IMG, (self.x, self.y))
 
+        for i, num in enumerate(self.start):
+            if num != "0":
+                draw_number(win, num, i % 9, math.floor(i / 9), BLACK)
 
-def draw_num(win, num, i, j, color):
-    number = NUM_FONT.render(str(num), 1, color)
-    win.blit(number, grid_locs[i][j])
+
+def draw_number(win, number, i, j, color):
+    num = NUMBER_FONT.render(str(number), 1, color)
+    win.blit(num, grid_locs[j][i])
     
-
-
 
 def draw_window(win, grid): # in this function, we will place all CLASS.draw() fxns
     grid.draw(win)
 
-    draw_num(win, 5, 4, 4, GREEN)
+    # draw_number(win, 5, 4, 4, GREEN)
 
-    # x = 50
-    # y = 50
-    # loc = (42, 36)
-    # number = NUM_FONT.render(str(9), 1, RED)
-    # win.blit(number, loc)
 
     pygame.display.update()
 
@@ -89,6 +90,10 @@ if __name__ == "__main__":
     GRID = Grid()
 
     draw_window(WIN, GRID)
+
+
+    # PUT SOLVING/DRAWING ALGORITHM HERE #
+
 
     running = True
     while running:
