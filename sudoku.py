@@ -33,8 +33,11 @@ X_OFFSET = 42
 Y_OFFSET = 36
 
 
+# input_string = input("Enter the string for the starting grid of the sudoku:")
+
+
 # a list of 81 numbers separated by spaces. zeroes are blanks in the sudoku
-SUDOKU_START = "3 0 6 5 0 8 4 0 0 5 2 0 0 0 0 0 0 0 0 8 7 0 0 0 0 3 1 0 0 3 0 1 0 0 8 0 9 0 0 8 6 3 0 0 5 0 5 0 0 9 0 6 0 0 1 3 0 0 0 0 2 5 0 0 0 0 0 0 0 0 7 4 0 0 5 2 0 6 3 0 0"
+SUDOKU_START = "040509108710004500030007940965070231070000080103960000000050700300006000650801300"
 
 
 # 9x9 GLOBAL matrix of pixel locations to the center of each square
@@ -62,7 +65,7 @@ class Grid:  # this is the sudoku grid of the window
     def __init__(self):
         self.y = 0
         self.x = 0
-        self.start = SUDOKU_START.split()
+        self.start = list(SUDOKU_START) # splits the string into useable list format
 
     def draw(self, win):
         win.blit(self.IMG, (self.x, self.y))
@@ -72,6 +75,12 @@ class Grid:  # this is the sudoku grid of the window
                 draw_number(win, num, i % 9, math.floor(i / 9), BLACK)
 
 
+    def solve(self):
+        for i, num in enumerate(self.start):
+            print(i, num)
+
+
+
 def draw_number(win, number, i, j, color):
     num = NUMBER_FONT.render(str(number), 1, color)
     win.blit(num, grid_locs[j][i])
@@ -79,6 +88,7 @@ def draw_number(win, number, i, j, color):
 
 def draw_window(win, grid): # in this function, we will place all CLASS.draw() fxns
     grid.draw(win)
+    grid.solve()
 
     # draw_number(win, 5, 4, 4, GREEN)
 
