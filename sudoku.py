@@ -79,12 +79,12 @@ class Sudoku:  # this is the sudoku grid of the window
 
 
     def solver(self):
-        s1 = self.start # save the initial sudoku value for backtracking
+        s = self.start # save the initial sudoku value for backtracking
         s2 = self.start
 
-        for i, num in enumerate(s1):
-            if num == "0": # we need to implement an algorithm to fill in numbers, here
-                
+        # for i, num in enumerate(s):
+        #     if num == "0": # we need to implement an algorithm to fill in numbers, here
+        #         filter(lambda x: x not in Z, item)
 
 
 def draw_number(win, number, i, j, color):
