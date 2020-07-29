@@ -21,7 +21,10 @@ os.environ['SDL_VIDEO_CENTERED'] = '1'  # center window
 WIN_WIDTH = 500
 WIN_HEIGHT = 500
 NUMBER_FONT = pygame.font.SysFont("Cascadia Code", 50)
-# Colors 
+X_OFFSET = 42
+Y_OFFSET = 36
+
+# COLORS 
 BLACK = (0,0,0)
 WHITE = (255,255,255)
 BLUE =(53, 115, 255)
@@ -29,8 +32,7 @@ RED = (200,0,0)
 GREEN = (0, 200, 0)
 BRIGHT_RED = (255,0,0)
 BRIGHT_GREEN = (0,255,0)
-X_OFFSET = 42
-Y_OFFSET = 36
+
 
 
 # input_string = input("Enter the string for the starting grid of the sudoku:")
@@ -59,15 +61,16 @@ pygame.display.set_caption("Sudoku Solver")
 GRID_IMG = pygame.image.load(os.path.join("grid.png"))
 
 
-class Grid:  # this is the sudoku grid of the window
+class Sudoku:  # this is the sudoku grid of the window
     IMG = GRID_IMG
 
     def __init__(self):
         self.y = 0
         self.x = 0
         self.start = list(SUDOKU_START) # splits the string into useable list format
+        self.possible = ['1','2','3','4','5','6','7','8','9'] # the possible numbers of sudoku
 
-    def draw(self, win):
+    def draw_initial(self, win):
         win.blit(self.IMG, (self.x, self.y))
 
         for i, num in enumerate(self.start):
@@ -75,10 +78,13 @@ class Grid:  # this is the sudoku grid of the window
                 draw_number(win, num, i % 9, math.floor(i / 9), BLACK)
 
 
-    def solve(self):
-        for i, num in enumerate(self.start):
-            print(i, num)
+    def solver(self):
+        s1 = self.start # save the initial sudoku value for backtracking
+        s2 = self.start
 
+        for i, num in enumerate(s1):
+            if num == "0": # we need to implement an algorithm to fill in numbers, here
+                
 
 
 def draw_number(win, number, i, j, color):
@@ -86,20 +92,20 @@ def draw_number(win, number, i, j, color):
     win.blit(num, grid_locs[j][i])
     
 
-def draw_window(win, grid): # in this function, we will place all CLASS.draw() fxns
-    grid.draw(win)
-    grid.solve()
+def draw_window(win, sudoku): # in this function, we will place all CLASS.draw() fxns
+    sudoku.draw_initial(win)
+    sudoku.solver()
 
     # draw_number(win, 5, 4, 4, GREEN)
 
 
-    pygame.display.update()
-
 
 if __name__ == "__main__":
-    GRID = Grid()
+    SUDOKU = Sudoku()
 
-    draw_window(WIN, GRID)
+    draw_window(WIN, SUDOKU)
+
+    pygame.display.update()
 
 
     # PUT SOLVING/DRAWING ALGORITHM HERE #
