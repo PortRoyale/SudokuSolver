@@ -23,23 +23,25 @@ s = list(SUDOKU_INPUT)
 print(s)
 
 all_ = ['1','2','3','4','5','6','7','8','9']
-
+maybe = []
 
 for i, num in enumerate(s):
     if num == "0": # we need to implement an algorithm to fill in numbers, here
         k = floor(i / 9) * 9 # the index of the beginning of the row that the i index is in
         verts = [z for z in s[i::9] if z not in s[k:k+9]] # the set of numbers vertically that are not in the horizontal subspace
-        maybe = [z for z in all_ if z not in (verts + s[k:k+9])] # the subspace of numbers that can be possible solutions
-        print(i, k, verts, maybe)
+        maybe.append([z for z in all_ if z not in (verts + s[k:k+9])]) # the subspace of numbers that can be possible solutions
+        print("maybe", maybe)
 
-        # if len(maybe) == 1:
-        #     s[i] = maybe
-        #     print(i, s)
-        #     break
-        # else:
-        #     for l, num in enumerate(maybe):
-        #         s[i] = maybe[l]
+        if len(maybe[-1]) == 1: # this must be the correct answer if only one choice
+            s[i] = maybe[-1][0] # assign the only possible answer to the square
+            # maybe[-1].pop() # delete that because we know it has to be true
+            print("len == 1:", i, s, maybe)
+            pass
+        else:
+            for m, n in enumerate(maybe): # we must keep these maybe's around incase we backtrack
+                print(maybe, i, m, n)
+                s[i] = maybe[-1][m]
 
 
 
-print(s, "\n", s[0:9], "\n", s[0::9])
+# print(s, "\n", s[0:9], "\n", s[0::9])
