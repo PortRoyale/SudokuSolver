@@ -44,12 +44,7 @@ SUDOKU_START = "0405091087100045000300079409650702310700000801039600000000507003
 
 # 9x9 GLOBAL matrix of pixel locations to the center of each square
 global grid_locs
-w = 9
-h = 9
-grid_locs = [[(x*50 + X_OFFSET, y*50 + Y_OFFSET) for x in range(w)] for y in range(h)] 
-
-print(grid_locs[0][0])
-
+grid_locs = [[(x*50 + X_OFFSET, y*50 + Y_OFFSET) for x in range(9)] for y in range(9)] # these locations are pixel-based and were find via trial and error
 
 WIN = pygame.display.set_mode((WIN_WIDTH, WIN_HEIGHT))
 
