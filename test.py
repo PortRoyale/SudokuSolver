@@ -4,15 +4,15 @@ from numpy import matrix
 from numpy import linalg
 from math import floor
 import numpy as np
+import sys
 
 
-X_OFFSET = 42
-Y_OFFSET = 36
+# X_OFFSET = 42
+# Y_OFFSET = 36
 
 
-w, h = 9, 9;
-global grid_locs 
-grid_locs = [[(x*50 + X_OFFSET, y*50 + Y_OFFSET) for x in range(w)] for y in range(h)] # 9 x 9 matrix of zeros
+# global grid_locs 
+# grid_locs = [[(x*50 + X_OFFSET, y*50 + Y_OFFSET) for x in range(9)] for y in range(9)] # 9 x 9 matrix of zeros
 
 
 
@@ -28,6 +28,10 @@ arr_1d = np.array(string_list) # convert to numpy array
 
 s = np.reshape(arr_1d, (9,9)) # convert to 9x9 array
 
+ref = s
+
+del(input_, string_list, arr_1d)
+
 print(s)
 
 all_ = [1,2,3,4,5,6,7,8,9]
@@ -36,39 +40,56 @@ sols = np.zeros((9,9), dtype = list) # create an array of lists to assign possib
 
 
 for r_i, row in enumerate(s):
-    for c_i, num in enumerate(row):
-        print(r_i, c_i, row, num)
-    
-        row_start = r_i * 9 # the index of the beginning of the row that the i index is in
+    for c_i, n in enumerate(row):
 
+        while True:
+            num = s[r_i, c_i]
+            
+            print(r_i, c_i, num)
 
+            horz_and_vert = np.append(s[r_i,:], s[:,c_i]) # combine horizontal and vertical elements into one list
+            flattened_box = s[r_i-r_i % 3:r_i-r_i % 3 + 3, c_i-c_i % 3:c_i-c_i % 3 + 3].flatten() # flatten the 3x3 local     box
+            all_checks = np.append(horz_and_vert, flattened_box) # all of the numbers that can't be solutions to    current index
+            sols[r_i, c_i] = [n for n in all_ if n not in all_checks] # assign list of possible solutions to an     array of lists
 
-        if num == 0: # we need to implement an algorithm to fill in numbers, here
-            horz_and_vert = np.append(row, s[:,c_i]) # combine horizontal and vertical elements into one list
-            flattened_box = s[r_i-r_i%3:r_i-r_i%3+3, c_i-c_i%3:c_i-c_i-c_i%3+3].flatten() # flatten the 3x3 local box
-            all_checks = np.append(horz_and_vert, flattened_box) # all of the numbers that can't be solutions to current index
+            if num == 0 and len(sols[r_i, c_i]) == 0:
+                print("BACKTRACKING from r_i: ", r_i, " c_i: ", c_i)
 
-            sols[r_i, c_i] = [n for n in all_ if n not in all_checks] # assign list of possible solutions to an array of lists
+                if 0 < c_i <= 8: # decrement column index before end of row
+                    c_i -= 1
+                elif c_i == 0: # decrement row and restart column index
+                    c_i = 8 
+                    r_i -= 1
+                elif c_i == 0 and r_i == 0:
+                    sys.exit("Went backwards to zero. Uh oh!!!")
+                else:
+                    sys.exit("Don't know how this happened. DEBUG.")
 
-            for num in sols[r_i, c_i]:
-                if len(sols[r_i, c_i]) == 1: # this is the only solution 
-                    s[r_i, c_i] = sols[r_i, c_i] # assign new value to the sudoku grid solution
-                    sols[r_i, c_i] = [] # replace sols entry with empty list
-                    # UPDATE UI/UX HERE
-                else: # there is more than one solution...hmmm
-                    
-                    print(num, len(sols[r_i,c_i]))
-       
-            # if len(maybe[-1]) == 1: # this must be the correct answer if only one choice
-            #     s[i] = maybe[-1][0] # assign the only possible answer to the square
-            #     # maybe[-1].pop() # delete that because we know it has to be true
-            #     print("len == 1:", i, s, maybe)
-            #     pass
-            # else:
-            #     for m, n in enumerate(maybe): # we must keep these maybe's around incase we backtrack
-            #         print(maybe, i, m, n)
-            #         s[i] = maybe[-1][m]
+                break
 
+            elif num == 0:
+                for num in sols[r_i, c_i]:
+                    if len(sols[r_i, c_i]) == 1: # this is the only solution 
+                        s[r_i, c_i] = sols[r_i, c_i][0] # assign new value to the sudoku grid solution
+                        sols[r_i, c_i] = [] # replace sols entry with empty list
+                        # UPDATE UI/UX HERE
+                    else: # there is more than one solution...hmmm
+                        for sol in sols[r_i, c_i]: # iterate through list of solutions
+                            # print(sols)
+                            s[r_i, c_i] = sols[r_i, c_i][-1]
+                            sols[r_i, c_i].pop()
+                            # print("popped:", sols[r_i, c_i])
+            else:
+                pass
+            
 
-
-# # # print(s, "\n", s[0:9], "\n", s[0::9])
+            if 0 <= c_i < 8: # increment column index before end of row
+                c_i += 1
+            elif c_i == 8: # increment row and restart column index
+                c_i = 0 
+                r_i += 1
+            elif c_i == 8 and r_i == 8:
+                    print(s)
+                    sys.exit("FOUND A SOLUTION!!!!")
+            else:
+                sys.exit("Don't know how this happened. DEBUG.")
