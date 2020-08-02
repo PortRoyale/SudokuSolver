@@ -14,13 +14,16 @@ SUDOKU_INPUT = "0006070958090002070060093006000204091000000200000060000100009400
 def initialize_grid(sudoku_input):
     string_list = list(map(int, list(sudoku_input))) # convert input to a list of strings and then change all of those string numbers to ints
     arr_1d = np.array(string_list) # convert to numpy array
-    s = np.reshape(arr_1d, (9,9)) # convert to 9x9 array
+    sudoku = np.reshape(arr_1d, (9,9)) # convert to 9x9 array
 
-    sols = np.zeros((9,9), dtype = object) # create an array of lists to assign possible solutions to later
+    solutions = np.zeros((9,9), dtype = object) # create an array of lists to assign possible solutions to later
 
     del(string_list, arr_1d) # delete what we don't need ( not sure if this is necessary, will Google it)
 
-    return s, sols
+    row_start = 0
+    column_start = 0
+
+    return sudoku, solutions, row_start, column_start
 
 
 def move(row_index, column_index, forward):
@@ -53,21 +56,28 @@ def move(row_index, column_index, forward):
          sys.exit("Wrong parameter, move(forward=???) function. DEBUG.")
 
 
-def find_solutions(sudoku, row_index, column_index, sols): # fxn to find possible sudoku solutions at the current location in the grid
+def find_solutions(sudoku, row_index, column_index, solutions): # fxn to find possible sudoku solutions at the current location in the grid
     all_ = [1,2,3,4,5,6,7,8,9]
     
     horz_and_vert = np.append(sudoku[row_index,:], sudoku[:,column_index]) # combine horizontal and vertical elements into one list
     flattened_box = sudoku[row_index-row_index % 3:row_index-row_index % 3 + 3, column_index-column_index % 3:column_index-column_index % 3 + 3].flatten() # flatten the 3x3 local box    
     all_checks = np.append(horz_and_vert, flattened_box) # all of the numbers that can't be solutions to  current index
-    sols[r_i, c_i] = [n for n in all_ if n not in all_checks]
+    solutions[row_index, column_index] = [n for n in all_ if n not in all_checks] # check for what possible numbers could be
 
-    return sols
+    # assign a label to the numbers that were present at the beginning of the puzzle aka GRID #'s
+    for row_index, row in enumerate(sudoku):
+        for column_index, num in enumerate(row):
+            if num in all_: # find the numbers that are part of the initial grid
+                sols[row_index, column_index] = ["GRID #"]
+
+
+    return solutions
 
 
 
 
 
-s, sols = initialize_grid(sudoku_input = SUDOKU_INPUT)
+s, sols, r_i, c_i = initialize_grid(sudoku_input = SUDOKU_INPUT)
 
 
 while True:
@@ -75,11 +85,6 @@ while True:
     
     print(r_i, c_i, num)
     print(s)
-
-
-    horz_and_vert = np.append(s[r_i,:], s[:,c_i]) # combine horizontal and vertical elements into one list
-    flattened_box = s[r_i-r_i % 3:r_i-r_i % 3 + 3, c_i-c_i % 3:c_i-c_i % 3 + 3].flatten() # flatten the 3x3 local box    
-    all_checks = np.append(horz_and_vert, flattened_box) # all of the numbers that can't be solutions to  current index
 
 
     if back_trigger == False and (sols[r_i, c_i] == ["GRID #"] or sols[r_i, c_i] == ["FILLED"]): # skip forward over numbers already filled
