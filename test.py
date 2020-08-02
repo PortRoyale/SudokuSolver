@@ -74,8 +74,14 @@ c_i = 0
 back_trigger = False
 
 
-def find_solutions(sudoku, row_index, column_index):
-    pass
+# fxn to find possible sudoku solutions at the current location in the grid
+def find_solutions(sudoku, row_index, column_index, sols):
+    horz_and_vert = np.append(sudoku[row_index,:], sudoku[:,column_index]) # combine horizontal and vertical elements into one list
+    flattened_box = sudoku[row_index-row_index % 3:row_index-row_index % 3 + 3, column_index-column_index % 3:column_index-column_index % 3 + 3].flatten() # flatten the 3x3 local box    
+    all_checks = np.append(horz_and_vert, flattened_box) # all of the numbers that can't be solutions to  current index
+    sols[r_i, c_i] = [n for n in all_ if n not in all_checks]
+
+    return sols
 
 
 
