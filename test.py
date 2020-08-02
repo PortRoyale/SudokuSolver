@@ -1,8 +1,5 @@
 # this file is for test scripting relating to the sudoku solver file titled sudoku.py
 
-from numpy import matrix
-from numpy import linalg
-from math import floor
 import numpy as np
 import sys
 
@@ -54,7 +51,6 @@ def move(row_index, column_index, forward):
     # SOMETHING ELSE
     else: 
          sys.exit("Wrong parameter, move(forward=???) function. DEBUG.")
-
 
 
 def find_solutions(sudoku, row_index, column_index, sols): # fxn to find possible sudoku solutions at the current location in the grid
