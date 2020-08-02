@@ -34,7 +34,7 @@ del(input_, string_list, arr_1d)
 
 # print(s)
 
-all_ = [1,2,3,4,5,6,7,8,9]
+
 
 sols = np.zeros((9,9), dtype = object) # create an array of lists to assign possible solutions to later
 
@@ -76,6 +76,8 @@ back_trigger = False
 
 # fxn to find possible sudoku solutions at the current location in the grid
 def find_solutions(sudoku, row_index, column_index, sols):
+    all_ = [1,2,3,4,5,6,7,8,9]
+    
     horz_and_vert = np.append(sudoku[row_index,:], sudoku[:,column_index]) # combine horizontal and vertical elements into one list
     flattened_box = sudoku[row_index-row_index % 3:row_index-row_index % 3 + 3, column_index-column_index % 3:column_index-column_index % 3 + 3].flatten() # flatten the 3x3 local box    
     all_checks = np.append(horz_and_vert, flattened_box) # all of the numbers that can't be solutions to  current index
