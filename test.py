@@ -7,36 +7,23 @@ import numpy as np
 import sys
 
 
-# X_OFFSET = 42
-# Y_OFFSET = 36
-
-
-# global grid_locs 
-# grid_locs = [[(x*50 + X_OFFSET, y*50 + Y_OFFSET) for x in range(9)] for y in range(9)] # 9 x 9 matrix of zeros
-
-
-
 
 
 SUDOKU_INPUT = "000607095809000207006009300600020409100000020000006000010000940000830000002900150"
 
-input_ = list(SUDOKU_INPUT)
-
-string_list = list(map(int, input_)) # change all numbers from strings to ints
-
-arr_1d = np.array(string_list) # convert to numpy array
-
-s = np.reshape(arr_1d, (9,9)) # convert to 9x9 array
-
-ref = s
-
-del(input_, string_list, arr_1d)
-
-# print(s)
 
 
 
-sols = np.zeros((9,9), dtype = object) # create an array of lists to assign possible solutions to later
+def initialize_grid(sudoku_input):
+    string_list = list(map(int, list(sudoku_input))) # convert input to a list of strings and then change all of those string numbers to ints
+    arr_1d = np.array(string_list) # convert to numpy array
+    s = np.reshape(arr_1d, (9,9)) # convert to 9x9 array
+
+    sols = np.zeros((9,9), dtype = object) # create an array of lists to assign possible solutions to later
+
+    del(string_list, arr_1d) # delete what we don't need ( not sure if this is necessary, will Google it)
+
+    return s, sols
 
 
 def move(row_index, column_index, forward):
@@ -68,14 +55,9 @@ def move(row_index, column_index, forward):
     else: 
          sys.exit("Wrong parameter, move(forward=???) function. DEBUG.")
 
-# Initialize Variables
-r_i = 0
-c_i = 0
-back_trigger = False
 
 
-# fxn to find possible sudoku solutions at the current location in the grid
-def find_solutions(sudoku, row_index, column_index, sols):
+def find_solutions(sudoku, row_index, column_index, sols): # fxn to find possible sudoku solutions at the current location in the grid
     all_ = [1,2,3,4,5,6,7,8,9]
     
     horz_and_vert = np.append(sudoku[row_index,:], sudoku[:,column_index]) # combine horizontal and vertical elements into one list
@@ -85,6 +67,11 @@ def find_solutions(sudoku, row_index, column_index, sols):
 
     return sols
 
+
+
+
+
+s, sols = initialize_grid(sudoku_input = SUDOKU_INPUT)
 
 
 while True:
