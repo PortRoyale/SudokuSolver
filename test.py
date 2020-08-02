@@ -13,7 +13,7 @@ SUDOKU_INPUT = "0006070958090002070060093006000204091000000200000060000100009400
 
 def initialize_grid(sudoku_input):
     all_ = [1,2,3,4,5,6,7,8,9]
-    
+
     string_list = list(map(int, list(sudoku_input))) # convert input to a list of strings and then change all of those string numbers to ints
     arr_1d = np.array(string_list) # convert to numpy array
     sudoku = np.reshape(arr_1d, (9,9)) # convert to 9x9 array
@@ -30,8 +30,9 @@ def initialize_grid(sudoku_input):
 
     row_start = 0
     column_start = 0
+    forward = True
 
-    return sudoku, solutions, row_start, column_start
+    return sudoku, solutions, row_start, column_start, forward
 
 
 def move(row_index, column_index, forward):
@@ -75,10 +76,8 @@ def find_solutions(sudoku, row_index, column_index, solutions): # fxn to find po
     return solutions
 
 
-
-
-
-s, sols, r_i, c_i = initialize_grid(sudoku_input = SUDOKU_INPUT)
+# Load and initialize the grid. Also, label GRID #'s in the solution array
+s, sols, r_i, c_i, forward = initialize_grid(sudoku_input = SUDOKU_INPUT)
 
 
 while True:
@@ -87,56 +86,15 @@ while True:
     print(r_i, c_i, num)
     print(s)
 
-
-    if back_trigger == False and (sols[r_i, c_i] == ["GRID #"] or sols[r_i, c_i] == ["FILLED"]): # skip forward over numbers already filled
+    if sols[r_i, c_i] == ["GRID #"]:
+        r_i, c_i, forward = move(r_i, c_i, forward)
+    elif forward == True and sols[r_i, c_i] != ["GRID #"]:
         pass
-    elif back_trigger == True and sols[r_i, c_i] == ["GRID #"]: # skip backwards over filled numbers
-        r_i, c_i, back_trigger = backtrack(r_i, c_i)
-    elif back_trigger == True and sols[r_i, c_i] == ["FILLED"]: # go back but remove number from location
-        s[r_i, c_i] = 0
-        sols[r_i, c_i] = 0
-        r_i, c_i, back_trigger = backtrack(r_i, c_i)
-    elif back_trigger == True and type(sols[r_i, c_i]) == list and len(sols[r_i,c_i]) > 0: # go back but remove number from location
-            for num in sols[r_i, c_i]:
-                if len(sols[r_i, c_i]) == 1: # this is the only solution 
-                    s[r_i, c_i] = sols[r_i, c_i][0] # assign new value to the sudoku grid solution
-                    sols[r_i, c_i] = ["FILLED"]
-                    # UPDATE UI/UX HERE
-                else: # there is more than one solution...hmmm
-                    for sol in sols[r_i, c_i]: # iterate through list of solutions
-                        s[r_i, c_i] = sols[r_i, c_i][-1]
-                        sols[r_i, c_i].pop()
-                        break
-    elif num != 0 and sols[r_i, c_i] == 0: # find the numbers that are part of the initial grid
-        sols[r_i, c_i] = ["GRID #"]
-    elif r_i == 8 and c_i == 8:
-        print("SOLUTION FOUND:")
-        sols[r_i, c_i] = [n for n in all_ if n not in all_checks]
-        s[r_i, c_i] = sols[r_i, c_i][0]
-        print(s)
-        sys.exit()
-    else: # there are solutions to be found or applied
-        sols[r_i, c_i] = [n for n in all_ if n not in all_checks] # assign list of possible solutions to a numpy 9x9 array of lists
-        # print(sols[r_i, c_i])
-
-        if num == 0 and len(sols[r_i, c_i]) == 0: # BACKTRACK: no possible solutions found so correct solution must be behind us
-                r_i, c_i, back_trigger = backtrack(r_i, c_i)
-        elif num == 0 or (num != 0 and len(sols[r_i, c_i]) > 0):  # 1) have't gotten here yet or 2)we have backtracked to get here and need to apply a new
-            for num in sols[r_i, c_i]:
-                if len(sols[r_i, c_i]) == 1: # this is the only solution 
-                    s[r_i, c_i] = sols[r_i, c_i][0] # assign new value to the sudoku grid solution
-                    sols[r_i, c_i] = ["FILLED"]
-                    # UPDATE UI/UX HERE
-                else: # there is more than one solution...hmmm
-                    for sol in sols[r_i, c_i]: # iterate through list of solutions
-                        s[r_i, c_i] = sols[r_i, c_i][-1]
-                        sols[r_i, c_i].pop()
-                        break
-                    break
-                break
-            back_trigger = False
-        else:
-            pass
+    elif forward == False and sols[r_i, c_i] != ["GRID #"]:
+        pass
+    elif r_i == 8 and c_i == 8: # SUCCESS!
+        pass
 
 
-    r_i, c_i, back_trigger = go_forward(r_i, c_i, back_trigger)
+
+
