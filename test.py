@@ -18,7 +18,7 @@ import sys
 
 
 
-SUDOKU_INPUT = "300008690700006518000000043600250009400000705081000000007002001000160000060300000"
+SUDOKU_INPUT = "000607095809000207006009300600020409100000020000006000010000940000830000002900150"
 
 input_ = list(SUDOKU_INPUT)
 
@@ -39,38 +39,34 @@ all_ = [1,2,3,4,5,6,7,8,9]
 sols = np.zeros((9,9), dtype = object) # create an array of lists to assign possible solutions to later
 
 
-def backtrack(r_i, c_i): 
-    if 0 < c_i <= 8: # decrement column index before end of row
-        c_i -= 1
-    elif c_i == 0: # decrement row and restart column index
-        c_i = 8 
-        r_i -= 1
-    elif c_i == 0 and r_i == 0:
-        sys.exit("Went backwards to zero. Uh oh!!!")
-    else:
-        sys.exit("Don't know how this happened. DEBUG.")
-    back_trigger = True
-    return r_i, c_i, back_trigger
-
-
-def go_forward(r_i, c_i, back_trigger):
-    if back_trigger == True:
-        return r_i, c_i, back_trigger
-    else: 
-        if 0 <= c_i < 8: # increment column index before end of row
-            c_i += 1
-        elif c_i == 8: # increment row and restart column index
-            c_i = 0 
-            r_i += 1
-        elif c_i == 8 and r_i == 8:
-                print(s)
-                sys.exit("FOUND A SOLUTION!!!!")
+def move(row_index, column_index, forward):
+    # GOING FORWARD
+    if forward == True: 
+        if column_index == 8 and row_index == 8:
+            pass # SUCCESS, I think
+        elif 0 <= column_index < 8: # increment column index before end of row
+            column_index += 1
+        elif column_index == 8: # increment row and restart column index
+            column_index = 0 
+            row_index += 1
         else:
-            sys.exit("Don't know how this happened. DEBUG.")
-        back_trigger = False
-
-        return r_i, c_i, back_trigger
-
+            sys.exit("Within move(forward=True) function, something went wrong. DEBUG.")
+        return row_index, column_index, forward
+    # GOING BACKWARD
+    elif forward == False:
+        if column_index <= 0 and row_index <= 0:
+            sys.exit("Went backwards to or past the 0th index. DEBUG.")
+        elif 0 < column_index <= 8: # decrement column index before end of row
+            column_index -= 1
+        elif column_index == 0 and row_index != 0: # decrement row and restart column index
+            column_index = 8 
+            row_index -= 1
+        else:
+            sys.exit("Within move(forward=False) function, something went wrong. DEBUG.")
+        return row_index, column_index, forward
+    # SOMETHING ELSE
+    else: 
+         sys.exit("Wrong parameter, move(forward=???) function. DEBUG.")
 
 # Initialize Variables
 r_i = 0
@@ -103,6 +99,17 @@ while True:
         s[r_i, c_i] = 0
         sols[r_i, c_i] = 0
         r_i, c_i, back_trigger = backtrack(r_i, c_i)
+    elif back_trigger == True and type(sols[r_i, c_i]) == list and len(sols[r_i,c_i]) > 0: # go back but remove number from location
+            for num in sols[r_i, c_i]:
+                if len(sols[r_i, c_i]) == 1: # this is the only solution 
+                    s[r_i, c_i] = sols[r_i, c_i][0] # assign new value to the sudoku grid solution
+                    sols[r_i, c_i] = ["FILLED"]
+                    # UPDATE UI/UX HERE
+                else: # there is more than one solution...hmmm
+                    for sol in sols[r_i, c_i]: # iterate through list of solutions
+                        s[r_i, c_i] = sols[r_i, c_i][-1]
+                        sols[r_i, c_i].pop()
+                        break
     elif num != 0 and sols[r_i, c_i] == 0: # find the numbers that are part of the initial grid
         sols[r_i, c_i] = ["GRID #"]
     elif r_i == 8 and c_i == 8:
@@ -127,6 +134,9 @@ while True:
                     for sol in sols[r_i, c_i]: # iterate through list of solutions
                         s[r_i, c_i] = sols[r_i, c_i][-1]
                         sols[r_i, c_i].pop()
+                        break
+                    break
+                break
             back_trigger = False
         else:
             pass
