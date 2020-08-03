@@ -93,22 +93,26 @@ while True:
     num = s[r_i, c_i]
     
     print(r_i, c_i, num)
-    print(s)
+    # print(s)
 
     if forward == True: # JUST MOVED FORWARD 
         if sols[r_i, c_i] == ["GRID #"]: # SKIP GRID #'s
             r_i, c_i, forward = move(r_i, c_i, forward)
+        elif sols[r_i, c_i] != ["GRID #"] and sols[r_i, c_i] == []:  # JUST MOVED BACKWARDS and met a non-Grid # without anymore solutions
+            s[r_i, c_i] = 0
+            r_i, c_i, forward = move(r_i, c_i, forward = False)
         elif sols[r_i, c_i] != ["GRID #"]: # CONTINUE MOVING FORWARD
             for num in sols[r_i, c_i]:
                 solution_check = find_solutions(s, r_i, c_i, sols)
     
-                if type(solution_check) == list and len(solution_check) == 0: # GO BACKWARDS, no solutions this way
+                if len(solution_check) == 0: # GO BACKWARDS, no solutions this way
                     if sols[r_i, c_i] == []:
                         s[r_i, c_i] = 0
                     r_i, c_i, forward = move(r_i, c_i, forward = False)
                     break           
                 elif len(sols[r_i, c_i]) == 1: # only solution
                     s[r_i, c_i] = sols[r_i, c_i][0] # assign new value to the sudoku grid solution
+                    sols[r_i, c_i].pop()
                     r_i, c_i, forward = move(r_i, c_i, forward = True)
                     # UPDATE UI/UX HERE
                 else: # there is more than one possible solution
@@ -119,20 +123,22 @@ while True:
     elif forward == False:
         if sols[r_i, c_i] == ["GRID #"]: # SKIP GRID #'s
             r_i, c_i, forward = move(r_i, c_i, forward)
-        elif sols[r_i, c_i] == []: # JUST MOVED BACKWARDS and met a non-Grid # without anymore solutions
+        elif sols[r_i, c_i] != ["GRID #"] and sols[r_i, c_i] == [] and r_i == 0 and c_i == 0:  # JUST MOVED BACKWARDS to s[0,0] but now we know we have correct number 
+            r_i, c_i, forward = move(r_i, c_i, forward = True)
+        elif sols[r_i, c_i] != ["GRID #"] and sols[r_i, c_i] == []:  # JUST MOVED BACKWARDS and met a non-Grid # without anymore solutions
             s[r_i, c_i] = 0
             r_i, c_i, forward = move(r_i, c_i, forward = False)
-            forward = True
-        elif sols[r_i, c_i] != ["GRID #"]: # WILL MOVE FORWARD FROM HERE because there are solutions
+        else: # WILL MOVE FORWARD FROM HERE because there are solutions
             for num in sols[r_i, c_i]:
                 solution_check = find_solutions(s, r_i, c_i, sols)
 
-                if type(solution_check) == list and len(solution_check) == 0: # GO BACKWARDS, no solutions this way
+                if len(solution_check) == 0: # GO BACKWARDS, no solutions this way
                     s[r_i, c_i] = 0
                     r_i, c_i, forward = move(r_i, c_i, forward = False)
                     break           
                 elif len(sols[r_i, c_i]) == 1: # only solution
                     s[r_i, c_i] = sols[r_i, c_i][0] # assign new value to the sudoku grid solution
+                    sols[r_i, c_i].pop()
                     r_i, c_i, forward = move(r_i, c_i, forward = True)
                     # UPDATE UI/UX HERE
                 else: # there is more than one possible solution
