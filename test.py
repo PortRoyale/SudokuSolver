@@ -123,8 +123,24 @@ while True:
     elif forward == False:
         if sols[r_i, c_i] == ["GRID #"]: # SKIP GRID #'s
             r_i, c_i, forward = move(r_i, c_i, forward)
-        elif sols[r_i, c_i] != ["GRID #"] and sols[r_i, c_i] == [] and r_i == 0 and c_i == 0:  # JUST MOVED BACKWARDS to s[0,0] but now we know we have correct number 
+        elif sols[r_i, c_i] != ["GRID #"] and r_i == 0 and c_i == 0:  # JUST MOVED BACKWARDS to s[0,0] but now we know we have correct number 
+            saved_sols = sols[0,0]
+
+            sols = np.zeros((9,9), dtype = object)
+            for row_index, row in enumerate(s):
+                for column_index, num in enumerate(row):
+                    sol = find_solutions(s, row_index, column_index, sols)
+
+                    if len(sol) == 1: # if only one solution, fill in grid with it in a different color ############################
+                        sols[row_index, column_index] = ["GRID #"]
+                        s[row_index, column_index] = sol[0]
+                    else:
+                        sols[row_index, column_index] = sol
+
+            sols[0,0] = saved_sols[:-1]
+
             r_i, c_i, forward = move(r_i, c_i, forward = True)
+
         elif sols[r_i, c_i] != ["GRID #"] and sols[r_i, c_i] == []:  # JUST MOVED BACKWARDS and met a non-Grid # without anymore solutions
             s[r_i, c_i] = 0
             r_i, c_i, forward = move(r_i, c_i, forward = False)
