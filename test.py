@@ -47,7 +47,9 @@ def move(row_index, column_index, forward):
     # GOING FORWARD
     if forward == True: 
         if column_index == 8 and row_index == 8:
-            pass # SUCCESS, I think
+            print(s)
+            print(sols)
+            sys.exit("SUCCESS")# SUCCESS, I think
         elif 0 <= column_index < 8: # increment column index before end of row
             column_index += 1
         elif column_index == 8: # increment row and restart column index
@@ -128,13 +130,25 @@ while True:
             s, sols, r_i, c_i, forward = initialize_grid(sudoku_input = SUDOKU_INPUT)
 
             if len(saved_sols) == 1:
-                sols[0,0] = saved_sols
+                sols[0,0] = ["GRID #"]
                 s[0,0] = saved_sols[0]
             else:
                 sols[0,0] = saved_sols[:-1]
                 s[0,0] = saved_sols[-1]
 
             r_i, c_i, forward = move(r_i, c_i, forward = True)
+        # elif all sols[before where we are at] == ["GRID #"]:  # JUST MOVED BACKWARDS to s[0,0]
+        #     saved_sols = sols[0,0]
+        #     s, sols, r_i, c_i, forward = initialize_grid(sudoku_input = SUDOKU_INPUT)
+
+        #     if len(saved_sols) == 1:
+        #         sols[0,0] = ["GRID #"]
+        #         s[0,0] = saved_sols[0]
+        #     else:
+        #         sols[0,0] = saved_sols[:-1]
+        #         s[0,0] = saved_sols[-1]
+
+        #     r_i, c_i, forward = move(r_i, c_i, forward = True)
 
         elif sols[r_i, c_i] != ["GRID #"] and sols[r_i, c_i] == []:  # JUST MOVED BACKWARDS and met a non-Grid # without anymore solutions
             s[r_i, c_i] = 0
