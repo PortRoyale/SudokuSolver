@@ -80,42 +80,52 @@ def find_solutions(sudoku, row_index, column_index, solutions): # fxn to find po
     return sol
 
 
-def solver(sudoku_grid, row_index, column_index, solutions):
+def backtracking(sudoku_grid, row_index, column_index, solutions):
     forward = True
 
     sudoku = sudoku_grid
 
     while True:
 
+        # print(sudoku[0,:])
+        # print(solutions[row_index, :])
 
-        if r_i == 9 and c_i == 0:
+        if row_index == 9 and column_index == 0:
             print(s)
             sys.exit("SUCCESS!")
 
-        elif 0 <= r_i <= 8 and 0 <= c_i <= 8:
-            if solutions[row_index, column_index] == ["GRID #"]: # encountered a GRID #, keep it moving, wherever you were going
-                row_index, column_index, forward = move(row_index, column_index, forward)
-                break
+        elif 0 <= row_index <= 8 and 0 <= column_index <= 8:
 
             sol = find_solutions(sudoku, row_index = row_index, column_index = column_index, solutions = solutions)
             
-            if sol == []: # no solution, move backwards
+            if solutions[row_index, column_index] == ["GRID #"]: # encountered a GRID #, keep it moving, wherever you were going
+                row_index, column_index, forward = move(row_index, column_index, forward)
+            elif sol == []: # no solution, move backwards
+                sudoku[row_index, column_index] = 0
                 row_index, column_index, forward = move(row_index, column_index, forward = False) 
-            else: # not empty, need to try one and save the others
+            elif forward == True: # not empty, need to try one and save the others
                 sudoku[row_index, column_index] = sol[-1]
                 sol.pop()
-                saved_sol = sol
-
+                solutions[row_index, column_index] = sol
                 row_index, column_index, forward = move(row_index, column_index, forward = True)
+            elif forward == False: # not empty, need to try one and save the others
+                if solutions[row_index, column_index] == []: # solution set is empty, keep going backwards
+                    sudoku[row_index, column_index] = 0
+                    row_index, column_index, forward = move(row_index, column_index, forward = False)
+                else: # there are still possible solutions to check. try one and go forward
+                    sudoku[row_index, column_index] = solutions[row_index, column_index][-1]
+                    solutions[row_index, column_index].pop()
+                    row_index, column_index, forward = move(row_index, column_index, forward = True)
         else:
             sys.exit("BROKEN.")
 
-        print(sudoku)
+
         pass
             
 
-# Load and initialize the grid. Also, label GRID #'s in the solution array
-s, sols, r_i, c_i, forward = initialize_grid(sudoku_input = SUDOKU_INPUT)
 
-
-solver(s, r_i, c_i, sols)
+if __name__ == "__main__":
+    
+    s, sols, r_i, c_i, forward = initialize_grid(sudoku_input = SUDOKU_INPUT)
+    
+    backtracking(s, r_i, c_i, sols)
