@@ -2,11 +2,12 @@
 
 import numpy as np
 import sys
+import time
 
 
 
 
-SUDOKU_INPUT = "000607095809000207006009300600020409100000020000006000010000940000830000002900150"
+SUDOKU_INPUT = "803900070000030205002807930300271000040080000007350108078502090100008450260400000"
 
 
 
@@ -40,11 +41,7 @@ def initialize_grid(sudoku_input):
 def move(row_index, column_index, forward):
     # GOING FORWARD
     if forward == True: 
-        if column_index == 8 and row_index == 8:
-            print(s)
-            print(sols)
-            sys.exit("SUCCESS")# SUCCESS, I think
-        elif 0 <= column_index < 8: # increment column index before end of row
+        if 0 <= column_index < 8: # increment column index before end of row
             column_index += 1
         elif column_index == 8: # increment row and restart column index
             column_index = 0 
@@ -81,21 +78,27 @@ def find_solutions(sudoku, row_index, column_index, solutions): # fxn to find po
 
 
 def backtracking(sudoku_grid, row_index, column_index, solutions):
+    print("Solving...")
+    print(sudoku_grid)
+
+    solving = True
+
     forward = True
 
     sudoku = sudoku_grid
 
-    while True:
+    start = time.time()
+
+    while solving == True:
 
         # print(sudoku[0,:])
         # print(solutions[row_index, :])
 
-        if row_index == 9 and column_index == 0:
-            print(s)
-            sys.exit("SUCCESS!")
-
+        if row_index == 8 and column_index == 8: # SUCCESS
+            sudoku[row_index, column_index] = find_solutions(sudoku, row_index = row_index, column_index = column_index, solutions = solutions)[0]
+            print(sudoku)
+            solving = False
         elif 0 <= row_index <= 8 and 0 <= column_index <= 8:
-
             sol = find_solutions(sudoku, row_index = row_index, column_index = column_index, solutions = solutions)
             
             if solutions[row_index, column_index] == ["GRID #"]: # encountered a GRID #, keep it moving, wherever you were going
@@ -120,7 +123,8 @@ def backtracking(sudoku_grid, row_index, column_index, solutions):
             sys.exit("BROKEN.")
 
 
-        pass
+    time_lapsed = time.time() - start
+    print(time_lapsed, "seconds")
             
 
 
