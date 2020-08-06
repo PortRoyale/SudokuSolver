@@ -7,30 +7,36 @@
 import pygame
 from pygame.locals import *
 import os
-import random
 import math
 import numpy as np
 import sys
 import time
+from time import sleep
 
 
 # a list of 81 numbers separated by spaces. zeroes are blanks in the sudoku
-SUDOKU_INPUT = "040509108710004500030007940965070231070000080103960000000050700300006000650801300"
+SUDOKU_INPUT = "000700154109000030000006200500801000016000800897060021000604000920500007600003000"
 
 
 
 
 pygame.init() # initialize pygame
 
-os.environ['SDL_VIDEO_CENTERED'] = '1'  # center window
+
+timer_resolution = pygame.TIMER_RESOLUTION
+print(timer_resolution)
+
+NUMBER_FONT = pygame.font.SysFont("Cascadia Code", 60) # set desired font characteristics in pygame
+WIN_WIDTH = 640
+WIN_HEIGHT = 640 
+WINDOW = pygame.display.set_mode((WIN_WIDTH, WIN_HEIGHT)) # set the desired pixel width and height in pygame
+GRID_IMG = pygame.image.load(os.path.join("gridDL.png")) # load the grid image I made in microsoft paint
+BLANK_IMG = pygame.image.load(os.path.join("blank.png")) # load the blank image I made in microsoft paint
+pygame.display.set_caption("Sudoku Solver") # label the pygame window
+os.environ['SDL_VIDEO_CENTERED'] = '1'  # center window on screen
+clock = pygame.time.Clock() # initialize a clock instance in pygame
 
 
-# CONSTANTS
-WIN_WIDTH = 500
-WIN_HEIGHT = 500
-NUMBER_FONT = pygame.font.SysFont("Cascadia Code", 50)
-X_OFFSET = 42
-Y_OFFSET = 36
 
 # COLORS 
 BLACK = (0,0,0)
@@ -42,60 +48,62 @@ BRIGHT_RED = (255,0,0)
 BRIGHT_GREEN = (0,255,0)
 
 
+class SudokuSolver():
 
-# input_string = input("Enter the string for the starting grid of the sudoku:")
-
-
-
-
-# 9x9 GLOBAL matrix of pixel locations to the center of each square
-global grid_locs
-grid_locs = [[(x*50 + X_OFFSET, y*50 + Y_OFFSET) for x in range(9)] for y in range(9)] # these locations are pixel-based and were find via trial and error
-
-
-clock = pygame.time.Clock()
-
-pygame.display.set_caption("Sudoku Solver")
-
-
-GRID_IMG = pygame.image.load(os.path.join("grid.png"))
-
-
-class SudokuWindow:  # this is the sudoku grid of the window
     def __init__(self):
-        self.WIN = pygame.display.set_mode((WIN_WIDTH, WIN_HEIGHT))
-        self.y = 0
-        self.x = 0
+        # PYGAME
+        self.tick = 50 # FPS of pygame
+
+        self.WIN = WINDOW
         self.IMG = GRID_IMG
-        self.grid = list(SUDOKU_INPUT) # splits the string into useable list format
-        self.possible = ['1','2','3','4','5','6','7','8','9'] # the possible numbers of sudoku
+        self.BLANK = BLANK_IMG
+        self.y = 20
+        self.x = 20
+        self.NUMBER_FONT = NUMBER_FONT
+        self.X_OFFSET = 41
+        self.Y_OFFSET = 38
+        self.grid_locs = [[(x*67 + self.X_OFFSET, y*67 + self.Y_OFFSET) for x in range(9)] for y in range(9)]
 
-    def draw_initial(self):
-        self.WIN.blit(self.IMG, (self.x, self.y))
-
-        for i, num in enumerate(self.grid):
-            if num != "0":
-                self.draw_number(num, i % 9, math.floor(i / 9), BLACK)
-
-    def draw_number(self, number, i, j, color):
-        num = NUMBER_FONT.render(str(number), 1, color)
-        self.WIN.blit(num, grid_locs[j][i])
-    
-
-    # def draw_window(self): # in this function, we will place all CLASS.draw() fxns
-        # sudoku.draw_initial(self.WIN)
-
-        # draw_number(win, 5, 4, 4, GREEN)
-
-
-
-class BacktrackingSolver:
-
-    def __init__(self):
+        # SUDOKU
         self.grid = list(SUDOKU_INPUT) # splits the string into useable list format
         self.all_ = [1,2,3,4,5,6,7,8,9] # the possible    numbers of sudoku
 
-    def initialize_grid(self):
+
+    def draw_number(self, number, row_index, column_index, color):
+        num = self.NUMBER_FONT.render(str(number), 1, color)
+        self.draw_blank(row_index, column_index)
+        self.WIN.blit(num, self.grid_locs[row_index][column_index])
+        pygame.display.update()
+
+
+    def draw_blank(self, row_index, column_index):
+        self.WIN.blit(BLANK_IMG, self.grid_locs[row_index][column_index])
+        pygame.display.update()
+
+
+    def draw_grid(self):
+        self.WIN.fill(BLUE)
+        self.WIN.blit(self.IMG, (self.x, self.y))
+        pygame.display.update()
+
+        for i, num in enumerate(self.grid):
+            if num != "0":
+                pygame.event.get()
+                self.draw_number(num, math.floor(i / 9), i % 9, BLACK)
+
+
+    def success(self, sudoku, solutions):
+        self.draw_grid()
+
+        for row_index, row in enumerate(sudoku):
+            for column_index, num in enumerate(row):
+                if solutions[row_index, column_index] != ["GRID #"]:
+                    self.draw_number(sudoku[row_index, column_index], row_index, column_index, GREEN)
+
+       
+
+
+    def load_grid(self):
         row_start = 0
         column_start = 0
         forward = True
@@ -158,43 +166,57 @@ class BacktrackingSolver:
 
 
     def backtracking(self):
-        sudoku, solutions, row_index, column_index, forward = self.initialize_grid()
+        sudoku, solutions, row_index, column_index, forward = self.load_grid()
 
         print("Solving...")
         print(sudoku)
 
-        start = time.time()
-
 
         solving = True
-        while solving == True:
-
-            # print(sudoku[0,:])
-            # print(solutions[row_index, :])
+        start = time.time()
+        
+        
+        while solving:
+            pygame.event.poll()
 
             if row_index == 8 and column_index == 8: # SUCCESS
-                sudoku[row_index, column_index] = self.find_solutions(sudoku, row_index =    row_index, column_index = column_index, solutions = solutions)[0]
-                print(sudoku)
-                solving = False
+                if solutions[row_index, column_index] == ["GRID #"]: # encountered a    GRID #, keep it moving, wherever you were going
+                    self.success(sudoku, solutions)
+                    solving = False
+                else:
+                    sudoku[row_index, column_index] = self.find_solutions(sudoku, row_index = row_index, column_index = column_index, solutions = solutions)[0]
+                    ### DRAW sudoku[row_index, column_index]
+                    self.draw_number(sudoku[row_index, column_index], row_index, column_index, RED)
+                    print(sudoku)
+                    self.success(sudoku, solutions)
+                    solving = False
             elif 0 <= row_index <= 8 and 0 <= column_index <= 8:
                 sol = self.find_solutions(sudoku, row_index = row_index, column_index =  column_index, solutions = solutions)
 
                 if solutions[row_index, column_index] == ["GRID #"]: # encountered a    GRID #, keep it moving, wherever you were going
-                    row_index, column_index, forward = self.move(row_index, column_index,    forward)
+                    row_index, column_index, forward = self.move(row_index, column_index, forward)
                 elif sol == []: # no solution, move backwards
                     sudoku[row_index, column_index] = 0
-                    row_index, column_index, forward = self.move(row_index, column_index,    forward = False) 
+                    ### DRAW BLANK SPACE
+                    self.draw_blank(row_index, column_index)
+                    row_index, column_index, forward = self.move(row_index, column_index, forward = False) 
                 elif forward == True: # not empty, need to try one and save the others
                     sudoku[row_index, column_index] = sol[-1]
+                    ### DRAW sudoku[row_index, column_index]
+                    self.draw_number(sudoku[row_index, column_index], row_index, column_index, RED)
                     sol.pop()
                     solutions[row_index, column_index] = sol
-                    row_index, column_index, forward = self.move(row_index, column_index,    forward = True)
+                    row_index, column_index, forward = self.move(row_index, column_index, forward = True)
                 elif forward == False: # not empty, need to try one and save the others
                     if solutions[row_index, column_index] == []: # solution set is  empty, keep going backwards
                         sudoku[row_index, column_index] = 0
+                        ### DRAW BLANK SPACE
+                        self.draw_blank(row_index, column_index)
                         row_index, column_index, forward = self.move(row_index,  column_index, forward = False)
                     else: # there are still possible solutions to check. try one and go     forward
                         sudoku[row_index, column_index] = solutions[row_index,  column_index][-1]
+                        #### DRAW sudoku[row_index, column_index]
+                        self.draw_number(sudoku[row_index, column_index], row_index, column_index, RED)
                         solutions[row_index, column_index].pop()
                         row_index, column_index, forward = self.move(row_index,  column_index, forward = True)
             else:
@@ -208,19 +230,16 @@ class BacktrackingSolver:
 
 
 
-
-
-
-
 if __name__ == "__main__":
-    SUDOKUWIN = SudokuWindow()
-    SUDOKUWIN.draw_initial()
+    SUDOKU = SudokuSolver()
+    SUDOKU.draw_grid()
+    SUDOKU.backtracking()
 
-    pygame.display.update()
+    # pygame.display.update()
 
 
-    BACKTRACK = BacktrackingSolver() # init
-    BACKTRACK.backtracking()
+    # BACKTRACK = BacktrackingSolver(SUDOKUWIN) # init
+    # BACKTRACK.backtracking()
 
 
 
