@@ -32,6 +32,8 @@ WIN_HEIGHT = 640
 WINDOW = pygame.display.set_mode((WIN_WIDTH, WIN_HEIGHT)) # set the desired pixel width and height in pygame
 GRID_IMG = pygame.image.load(os.path.join("gridDL.png")) # load the grid image I made in microsoft paint
 BLANK_IMG = pygame.image.load(os.path.join("blank.png")) # load the blank image I made in microsoft paint
+ICON_IMG = pygame.image.load(os.path.join("icon.png"))
+pygame.display.set_icon(ICON_IMG)
 pygame.display.set_caption("Sudoku Solver") # label the pygame window
 os.environ['SDL_VIDEO_CENTERED'] = '1'  # center window on screen
 clock = pygame.time.Clock() # initialize a clock instance in pygame
