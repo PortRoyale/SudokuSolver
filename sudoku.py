@@ -15,56 +15,43 @@ from time import sleep
 
 
 # a list of 81 numbers separated by spaces. zeroes are blanks in the sudoku
-SUDOKU_INPUT = "000700154109000030000006200500801000016000800897060021000604000920500007600003000"
+SUDOKU_INPUT = "317642000002570000056001002000030200800000007030010680090000005064700900008006074"
 
 
 
-
-pygame.init() # initialize pygame
-
-
-timer_resolution = pygame.TIMER_RESOLUTION
-print(timer_resolution)
-
-NUMBER_FONT = pygame.font.SysFont("Cascadia Code", 60) # set desired font characteristics in pygame
-WIN_WIDTH = 640
-WIN_HEIGHT = 640 
-WINDOW = pygame.display.set_mode((WIN_WIDTH, WIN_HEIGHT)) # set the desired pixel width and height in pygame
-GRID_IMG = pygame.image.load(os.path.join("gridDL.png")) # load the grid image I made in microsoft paint
-BLANK_IMG = pygame.image.load(os.path.join("blank.png")) # load the blank image I made in microsoft paint
-ICON_IMG = pygame.image.load(os.path.join("icon.png"))
-pygame.display.set_icon(ICON_IMG)
-pygame.display.set_caption("Sudoku Solver") # label the pygame window
-os.environ['SDL_VIDEO_CENTERED'] = '1'  # center window on screen
-clock = pygame.time.Clock() # initialize a clock instance in pygame
-
-
-
-# COLORS 
-BLACK = (0,0,0)
-WHITE = (255,255,255)
-BLUE =(53, 115, 255)
-RED = (200,0,0)
-GREEN = (0, 200, 0)
-BRIGHT_RED = (255,0,0)
-BRIGHT_GREEN = (0,255,0)
 
 
 class SudokuSolver():
 
     def __init__(self):
         # PYGAME
-        self.tick = 50 # FPS of pygame
+        pygame.init() # initialize pygame
 
-        self.WIN = WINDOW
-        self.IMG = GRID_IMG
-        self.BLANK = BLANK_IMG
-        self.y = 20
-        self.x = 20
-        self.NUMBER_FONT = NUMBER_FONT
-        self.X_OFFSET = 41
-        self.Y_OFFSET = 38
-        self.grid_locs = [[(x*67 + self.X_OFFSET, y*67 + self.Y_OFFSET) for x in range(9)] for y in range(9)]
+        self.NUMBER_FONT = pygame.font.SysFont("Cascadia Code", 60) # set desired font characteristics in pygame
+        self.WIN_WIDTH = 640
+        self.WIN_HEIGHT = 640 
+
+        self.WIN = pygame.display.set_mode((self.WIN_WIDTH, self.WIN_HEIGHT)) # set the desired pixel width and height in pygame
+        self.GRID_IMG = pygame.image.load(os.path.join("gridDL.png")) # load the grid image I made in microsoft paint
+        self.BLANK_IMG = pygame.image.load(os.path.join("blank.png")) # load the blank image I made in microsoft paint
+        self.ICON_IMG = pygame.image.load(os.path.join("icon.png"))
+        pygame.display.set_icon(self.ICON_IMG)
+        pygame.display.set_caption("Sudoku Solver") # label the pygame window
+        os.environ['SDL_VIDEO_CENTERED'] = '1'  # center window on screen
+        self.clock = pygame.time.Clock() # initialize a clock instance in pygame
+
+        # COLORS 
+        self.BLACK = (0,0,0)
+        self.WHITE = (255,255,255)
+        self.BLUE =(53, 115, 255)
+        self.RED = (200,0,0)
+        self.GREEN = (0, 200, 0)
+
+        self.y = 20 # Y direction offset of grid in window
+        self.x = 20 # X direction offset of grid in window
+        self.X_OFFSET = 41 # X offset of numbers in window
+        self.Y_OFFSET = 38 # y offset of numbers in window
+        self.grid_locs = [[(x*67 + self.X_OFFSET, y*67 + self.Y_OFFSET) for x in range(9)] for y in range(9)] # 9x9 matrix of (x,y) locations to print the numbers on the grid
 
         # SUDOKU
         self.grid = list(SUDOKU_INPUT) # splits the string into useable list format
@@ -79,19 +66,19 @@ class SudokuSolver():
 
 
     def draw_blank(self, row_index, column_index):
-        self.WIN.blit(BLANK_IMG, self.grid_locs[row_index][column_index])
+        self.WIN.blit(self.BLANK_IMG, self.grid_locs[row_index][column_index])
         pygame.display.update()
 
 
     def draw_grid(self):
-        self.WIN.fill(BLUE)
-        self.WIN.blit(self.IMG, (self.x, self.y))
+        self.WIN.fill(self.BLUE)
+        self.WIN.blit(self.GRID_IMG, (self.x, self.y))
         pygame.display.update()
 
         for i, num in enumerate(self.grid):
             if num != "0":
                 pygame.event.get()
-                self.draw_number(num, math.floor(i / 9), i % 9, BLACK)
+                self.draw_number(num, math.floor(i / 9), i % 9, self.BLACK)
 
 
     def success(self, sudoku, solutions):
@@ -100,11 +87,9 @@ class SudokuSolver():
         for row_index, row in enumerate(sudoku):
             for column_index, num in enumerate(row):
                 if solutions[row_index, column_index] != ["GRID #"]:
-                    self.draw_number(sudoku[row_index, column_index], row_index, column_index, GREEN)
+                    self.draw_number(sudoku[row_index, column_index], row_index, column_index, self.GREEN)
 
        
-
-
     def load_grid(self):
         row_start = 0
         column_start = 0
@@ -188,7 +173,7 @@ class SudokuSolver():
                 else:
                     sudoku[row_index, column_index] = self.find_solutions(sudoku, row_index = row_index, column_index = column_index, solutions = solutions)[0]
                     ### DRAW sudoku[row_index, column_index]
-                    self.draw_number(sudoku[row_index, column_index], row_index, column_index, RED)
+                    self.draw_number(sudoku[row_index, column_index], row_index, column_index, self.RED)
                     print(sudoku)
                     self.success(sudoku, solutions)
                     solving = False
@@ -205,7 +190,7 @@ class SudokuSolver():
                 elif forward == True: # not empty, need to try one and save the others
                     sudoku[row_index, column_index] = sol[-1]
                     ### DRAW sudoku[row_index, column_index]
-                    self.draw_number(sudoku[row_index, column_index], row_index, column_index, RED)
+                    self.draw_number(sudoku[row_index, column_index], row_index, column_index, self.RED)
                     sol.pop()
                     solutions[row_index, column_index] = sol
                     row_index, column_index, forward = self.move(row_index, column_index, forward = True)
@@ -218,15 +203,15 @@ class SudokuSolver():
                     else: # there are still possible solutions to check. try one and go     forward
                         sudoku[row_index, column_index] = solutions[row_index,  column_index][-1]
                         #### DRAW sudoku[row_index, column_index]
-                        self.draw_number(sudoku[row_index, column_index], row_index, column_index, RED)
+                        self.draw_number(sudoku[row_index, column_index], row_index, column_index, self.RED)
                         solutions[row_index, column_index].pop()
                         row_index, column_index, forward = self.move(row_index,  column_index, forward = True)
             else:
                 sys.exit("BROKEN.")
 
-
         time_lapsed = time.time() - start
-        print(time_lapsed, "seconds")
+
+        print("\n","Solved in", time_lapsed, "seconds.", "\n", sudoku)
             
 
 
