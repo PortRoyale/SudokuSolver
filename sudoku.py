@@ -61,13 +61,16 @@ class SudokuSolver():
         self.grid = list(SUDOKU_INPUT) # splits the string into useable list format
         self.all_ = [1,2,3,4,5,6,7,8,9] # the possible    numbers of sudoku
 
+        self.draw_grid()
+
+
 
     def draw_number(self, number, row_index, column_index, color):
         num = self.NUMBER_FONT.render(str(number), 1, color)
         self.draw_blank(row_index, column_index)
         self.WIN.blit(num, self.grid_locs[row_index][column_index])
         pygame.display.update()
-        self.clock.tick() # used to control FPS of program
+        # self.clock.tick(2) # used to control FPS of program
 
 
     def draw_blank(self, row_index, column_index):
@@ -78,11 +81,9 @@ class SudokuSolver():
     def draw_grid(self):
         self.WIN.fill(self.BLUE)
         self.WIN.blit(self.GRID_IMG, (self.x, self.y))
-        pygame.display.update()
 
         for i, num in enumerate(self.grid):
             if num != "0":
-                pygame.event.get()
                 self.draw_number(num, math.floor(i / 9), i % 9, self.BLACK)
 
                 self.if_you_want_to_quit()
@@ -188,7 +189,6 @@ class SudokuSolver():
                     sudoku[row_index, column_index] = self.find_solutions(sudoku, row_index = row_index, column_index = column_index, solutions = solutions)[0]
                     ### DRAW sudoku[row_index, column_index]
                     self.draw_number(sudoku[row_index, column_index], row_index, column_index, self.RED)
-                    print(sudoku)
                     self.success(sudoku, solutions)
                     solving = False
             elif 0 <= row_index <= 8 and 0 <= column_index <= 8:
@@ -224,15 +224,19 @@ class SudokuSolver():
                 sys.exit("BROKEN.")
 
 
+                    
         time_lapsed = time.time() - start
 
         print("\n","Solved in", time_lapsed, "seconds.", "\n", sudoku)
+
+        
+        while True:
+            self.if_you_want_to_quit()
+
             
 
 
 if __name__ == "__main__":
-    pygame.init()
 
     SUDOKU = SudokuSolver()
-    SUDOKU.draw_grid()
     SUDOKU.backtracking()
