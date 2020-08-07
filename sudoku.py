@@ -3,6 +3,8 @@
 #
 # Motivation: To create an implement an algorithm to solve a given sudoku problem. The solution must 
 #   be shown to the user to verify it's correctness in a neat and consistent manner. 
+# Methods: I have implemented a backtracking algorithm to solve a given Sudoku. I am not sure if this is the exact backtracking algorithm,
+#   because I thought it through and implemented myself, but it seems to work for any given Sudoku.
 
 import pygame
 from pygame.locals import *
@@ -14,8 +16,10 @@ import time
 from time import sleep
 
 
+
 # a list of 81 numbers separated by spaces. zeroes are blanks in the sudoku
-SUDOKU_INPUT = "317642000002570000056001002000030200800000007030010680090000005064700900008006074"
+SUDOKU_INPUT = "900704002060000910087000054008000790600009003000270000706900820040000106020005000"
+
 
 
 
@@ -25,7 +29,7 @@ class SudokuSolver():
 
     def __init__(self):
         # PYGAME
-        pygame.init() # initialize pygame
+        pygame.init()
 
         self.NUMBER_FONT = pygame.font.SysFont("Cascadia Code", 60) # set desired font characteristics in pygame
         self.WIN_WIDTH = 640
@@ -63,6 +67,7 @@ class SudokuSolver():
         self.draw_blank(row_index, column_index)
         self.WIN.blit(num, self.grid_locs[row_index][column_index])
         pygame.display.update()
+        self.clock.tick() # used to control FPS of program
 
 
     def draw_blank(self, row_index, column_index):
@@ -80,6 +85,8 @@ class SudokuSolver():
                 pygame.event.get()
                 self.draw_number(num, math.floor(i / 9), i % 9, self.BLACK)
 
+                self.if_you_want_to_quit()
+
 
     def success(self, sudoku, solutions):
         self.draw_grid()
@@ -88,6 +95,12 @@ class SudokuSolver():
             for column_index, num in enumerate(row):
                 if solutions[row_index, column_index] != ["GRID #"]:
                     self.draw_number(sudoku[row_index, column_index], row_index, column_index, self.GREEN)
+
+
+    def if_you_want_to_quit(self):
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit(); sys.exit()
 
        
     def load_grid(self):
@@ -158,13 +171,14 @@ class SudokuSolver():
         print("Solving...")
         print(sudoku)
 
-
         solving = True
         start = time.time()
-        
-        
+
+
         while solving:
-            pygame.event.poll()
+
+            self.if_you_want_to_quit()
+
 
             if row_index == 8 and column_index == 8: # SUCCESS
                 if solutions[row_index, column_index] == ["GRID #"]: # encountered a    GRID #, keep it moving, wherever you were going
@@ -209,33 +223,16 @@ class SudokuSolver():
             else:
                 sys.exit("BROKEN.")
 
+
         time_lapsed = time.time() - start
 
         print("\n","Solved in", time_lapsed, "seconds.", "\n", sudoku)
             
 
 
-
-
 if __name__ == "__main__":
+    pygame.init()
+
     SUDOKU = SudokuSolver()
     SUDOKU.draw_grid()
     SUDOKU.backtracking()
-
-    # pygame.display.update()
-
-
-    # BACKTRACK = BacktrackingSolver(SUDOKUWIN) # init
-    # BACKTRACK.backtracking()
-
-
-
-    # PUT SOLVING/DRAWING ALGORITHM HERE #
-
-
-    running = True
-
-    while running:
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                running = False
